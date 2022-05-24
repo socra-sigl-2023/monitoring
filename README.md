@@ -207,4 +207,6 @@ The setup on production is slightly different. We have implemented an E**F**K st
 
 When your app is on production, it should send logs on **stdout** and the Filebeat agent will read those logs from your containers standard output.
 
+**Important**: Remove the `logstash` appender from the `backend/src/server.js`'s `loggerConfig` object to make sure only logs on stdout are made. Otherwise you will have an error at runtime in production.
+
 So you have nothing to change, just push your changes on main, and you should be all set!
