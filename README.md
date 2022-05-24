@@ -81,7 +81,7 @@ First, you need to configure your logger to connect to your logstash.
 
 From your group's repository:
 - Add `logstash` host and port info to your `backend/.env` file (under your database env variables):
-```toml
+```plain
 LOGSTASH_HOST=localhost
 LOGSTASH_PORT=5000
 ```
@@ -103,7 +103,7 @@ const loggerConfig = {
     logstash: {
       type: "log4js-logstash",
       host: process.env.LOGSTASH_HOST,
-      port: process.env.LOGSTASH_PORT,
+      port: +process.env.LOGSTASH_PORT,
     },
   },
   categories: {
@@ -177,23 +177,16 @@ Login with credentials:
 You should see a welcome screen like:
 ![welcome](docs/welcome-elastic.png)
 
-- Click on `Add data`
-- On the sidebar menu icon, select the discover section:
-![discover](docs/discover-menu.png)
+- Menu (three bars on top left corner) > Stack Management  > Data Views > Create data view
+![](docs/create-data-view.png)
 
-> Note: You should see that kibana noticed you have some logs in your elasticsearch, but you don't have any indexes yet to search on those logs.
-> Let's create them!
+- Add the following fields:
+  - Name: `logs*`
+  - Timestamp field: `@timestamp`
+- Click `Create data view`
+![](docs/save-data-view.png)
 
-- Select `Create index` button:
-![create-index](docs/create-index-pattern.png)
-- Enter `logstash*` as index pattern name
-- Select `@timestamp` in the dropdown menu
-- Click `Create index pattern`:
-![step-1](docs/step-1-create-index-with-timestamp.png)
-- Go back to the sidebar menu > discover view.
-
-You should see your logs from previous step:
-![discover-table](docs/discover-table-log.png)
+- Menu > Discover
 
 By default, it shows logs from latest 15 minutes, you can increase the time range to find back your logs if it was more that 15 minutes ago.
 
@@ -207,14 +200,11 @@ Now, you can produce more logs of different level, and try to query them in the 
 - log info of which category has been queried with the format `category <categoryId> selected` (categoryId being the category selected by the user) 
 - log error if something wrong happened with the format `an error occurred: <error message>` (error message being the reason of the error)
 
-### Step 6 - Challenge: Adapt your CICD
+### Step 6 - Deploy your changes
 
-When your app is on production, it should send logs both on **stdout** and to the **logstash on production**.
+The setup on production is slightly different. We have implemented an E**F**K stack (Elasticsearch **F**ilebeat Kibana).
+![](docs/efk.png)
 
-**Objective**: Adapt your backend's CICD to:
-- set LOGSTASH_HOST to `pro.logstash.socra-sigl.fr`
-- set LOGSTASH_PORT to `5000`
+When your app is on production, it should send logs on **stdout** and the Filebeat agent will read those logs from your containers standard output.
 
-> Hint: You don't have to change much! It's exactly the same principle than for database workshop.
-
-You should be able to see your logs on https://kibana.pro.socra-sigl.fr
+So you have nothing to change, just push your changes on main, and you should be all set!
